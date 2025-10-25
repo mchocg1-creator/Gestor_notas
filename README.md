@@ -38,3 +38,13 @@ Opción del menú: Descripción
  11 Simular cola de solicitudes: Maneja solicitudes tipo cola 
  12 Mostrar historial: Muestra las acciones registradas 
  13 Salir: Cierra el programa 
+
+a.	¿Qué aprendí con este proyecto?
+Aprendí a usar listas, pilas y colas, a manipular diccionarios para almacenar información de cursos y a crear funciones que realizan tareas específicas, como registrar, buscar, actualizar y ordenar datos.
+
+b.¿Que fue lo más desafiante de resolver?
+Lo más difícil fue manejar correctamente la entrada de datos del usuario y asegurar que la búsqueda binaria funcionara solo en listas ordenadas.
+
+c.¿Qué mejoraria si tuvieras más tiempo?
+Mejoraría la interfaz para hacerla más amigable, implementaría almacenamiento en archivos para que los datos no se pierdan y añadiría estadísticas más avanzadas sobre los cursos.
+
