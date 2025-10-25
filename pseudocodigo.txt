@@ -1,0 +1,340 @@
+Pseudocódigo del programa de gestión de cursos
+
+Variables globales:
+
+cursos ← lista vacía // cada elemento: diccionario {nombre, nota}
+
+historial ← lista vacía // pila de acciones (LIFO)
+
+cola ← lista vacía // cola de solicitudes (FIFO)
+
+FUNCION registrar_curso()
+imprimir "Ingrese el nombre del curso:"
+nombre ← leer().strip().lower()
+SI nombre = "" ENTONCES
+imprimir "-El nombre no puede estar vacío-"
+retornar
+FIN SI
+
+// Verificar duplicado
+PARA CADA curso EN cursos HACER
+    SI curso['nombre'].lower() = nombre.lower() ENTONCES
+        imprimir f"--- El curso: {nombre} ya está registrado, no se puede repetir---"
+        // Nota: en el código original no retorna aquí; mantener comportamiento original:
+    FIN SI
+FIN PARA
+
+intentar
+    imprimir "Ingrese la nota del curso (0-100):"
+    nota ← convertir_a_float(leer())
+    SI nota < 0 O nota > 100 ENTONCES
+        imprimir "-La nota debe estar entre 0 y 100-"
+        retornar
+    FIN SI
+capturar error
+    imprimir "-Nota incorrecta, ingresa un valor numérico-"
+    retornar
+FIN intentar
+
+agregar {'nombre': nombre, 'nota': nota} a cursos
+apilar historial con "Curso agregado: {nombre} (nota {nota})"
+imprimir f"-Curso '{nombre}' (Nota: {nota}) registrado con éxito-"
+
+FUNCION mostrar_curso()
+SI cursos está vacío ENTONCES
+imprimir "---No hay cursos disponibles---"
+retornar
+FIN SI
+
+imprimir "---Lista de cursos---"
+i ← 1
+PARA CADA curso EN cursos HACER
+    imprimir f"{i}. {curso['nombre']} - Nota: {curso['nota']}"
+    i ← i + 1
+FIN PARA
+
+FIN FUNCION
+
+FUNCION promedio_general()
+SI cursos está vacío ENTONCES
+imprimir "---No hay cursos registrados---"
+retornar
+FIN SI
+
+suma ← 0
+PARA CADA c EN cursos HACER
+    suma ← suma + c['nota']
+FIN PARA
+promedio ← suma / longitud(cursos)
+imprimir f"-Tu promedio general es: {formatear(promedio, 2 decimales)}-"
+
+
+FIN FUNCION
+
+FUNCION cursos_aprobados_reprobados()
+SI cursos está vacío ENTONCES
+imprimir "---No hay cursos registrados---"
+retornar
+FIN SI
+
+aprobados ← 0
+PARA CADA c EN cursos HACER
+    SI c['nota'] >= 60 ENTONCES
+        aprobados ← aprobados + 1
+    FIN SI
+FIN PARA
+reprobados ← longitud(cursos) - aprobados
+imprimir f"---Aprobados: {aprobados}"
+imprimir f"---Reprobados: {reprobados}"
+
+
+FIN FUNCION
+
+FUNCION buscar_curso()
+SI cursos está vacío ENTONCES
+imprimir "---No hay cursos disponibles---"
+retornar
+FIN SI
+
+imprimir "Ingrese el nombre del curso a buscar:"
+nombre ← leer().strip().lower()
+encontrado ← FALSO
+
+PARA CADA curso EN cursos HACER
+    SI curso['nombre'].lower() = nombre ENTONCES
+        imprimir f"---Curso encontrado: {curso['nombre']}--- Nota: {curso['nota']}---"
+        encontrado ← VERDADERO
+        salir del ciclo
+    FIN SI
+FIN PARA
+
+SI NO encontrado ENTONCES
+    imprimir "---Curso no encontrado---"
+FIN SI
+
+
+FIN FUNCION
+
+FUNCION actualizar_nota()
+SI cursos está vacío ENTONCES
+imprimir "---No hay cursos disponibles---"
+retornar
+FIN SI
+
+llamar mostrar_curso()
+imprimir "Ingrese el número del curso que quiere actualizar:"
+indice ← convertir_a_entero(leer()) - 1
+
+SI indice entre 0 y longitud(cursos)-1 ENTONCES
+    imprimir "Ingrese la nueva nota (0-100):"
+    nueva_nota ← convertir_a_float(leer())
+    MIENTRAS nueva_nota < 0 O nueva_nota > 100 HACER
+        imprimir "Nota incorrecta, debe estar entre 0 y 100."
+        imprimir "Ingrese nuevamente la nota:"
+        nueva_nota ← convertir_a_float(leer())
+    FIN MIENTRAS
+
+    apilar historial con "Nota actualizada: {cursos[indice]['nombre']} {cursos[indice]['nota']} -> {nueva_nota}"
+    cursos[indice]['nota'] ← nueva_nota
+    imprimir "---Nota actualizada correctamente---"
+SINO
+    imprimir "---Número de curso inválido---"
+FIN SI
+
+
+FIN FUNCION
+
+FUNCION eliminar_curso()
+llamar mostrar_curso()
+SI cursos está vacío ENTONCES
+imprimir "---No hay cursos para eliminar---"
+retornar
+FIN SI
+
+intentar
+    imprimir "Ingrese el número del curso a eliminar:"
+    eliminar ← convertir_a_entero(leer()) - 1
+    SI eliminar < 0 O eliminar >= longitud(cursos) ENTONCES
+        imprimir "---Opción inválida---"
+        retornar
+    FIN SI
+
+    eliminado ← quitar elemento en posición eliminar de cursos
+    apilar historial con "Curso eliminado: {eliminado['nombre']}"
+    imprimir f"---Curso '{eliminado['nombre']}' eliminado---"
+capturar error
+    imprimir "---Error: ingrese un número válido---"
+FIN intentar
+
+
+FIN FUNCION
+
+FUNCION ordenar_burbuja() // ordena por nota de menor a mayor
+SI cursos está vacío ENTONCES
+imprimir "---No hay cursos disponibles---"
+retornar
+FIN SI
+
+n ← longitud(cursos)
+PARA i DESDE 0 HASTA n-1 HACER
+    PARA j DESDE 0 HASTA n-i-2 HACER
+        SI cursos[j]['nota'] > cursos[j+1]['nota'] ENTONCES
+            intercambiar cursos[j] con cursos[j+1]
+        FIN SI
+    FIN PARA
+FIN PARA
+
+imprimir "---Cursos ordenados por nota (menor a mayor):---"
+llamar mostrar_curso()
+
+
+FIN FUNCION
+
+FUNCION ordenar_por_insercion() // ordena por nombre ascendente
+SI cursos está vacío ENTONCES
+imprimir "---No hay cursos disponibles---"
+retornar
+FIN SI
+
+PARA i DESDE 1 HASTA longitud(cursos)-1 HACER
+    key ← cursos[i]
+    j ← i - 1
+    MIENTRAS j >= 0 Y cursos[j]['nombre'].lower() > key['nombre'].lower() HACER
+        cursos[j+1] ← cursos[j]
+        j ← j - 1
+    FIN MIENTRAS
+    cursos[j+1] ← key
+FIN PARA
+
+imprimir "---Cursos ordenados por nombre (inserción)---"
+llamar mostrar_curso()
+
+
+FIN FUNCION
+
+FUNCION busqueda_binaria(nombre)
+// Asume lista ordenada por nombre
+llamar ordenar_por_insercion()
+inicio ← 0
+fin ← longitud(cursos) - 1
+
+MIENTRAS inicio ≤ fin HACER
+    medio ← (inicio + fin) // 2
+    comparar ← cursos[medio]['nombre'].lower() comparado con nombre.lower()
+    SI comparar = igual ENTONCES
+        retornar cursos[medio]
+    SINO SI cursos[medio]['nombre'].lower() < nombre.lower() ENTONCES
+        inicio ← medio + 1
+    SINO
+        fin ← medio - 1
+    FIN SI
+FIN MIENTRAS
+
+retornar NULO
+
+
+FIN FUNCION
+
+FUNCION buscar_curso_binario()
+imprimir "Ingrese el nombre del curso a buscar:"
+nombre ← leer().strip()
+SI nombre = "" ENTONCES
+imprimir "---Nombre vacío---"
+retornar
+FIN SI
+
+resultado ← busqueda_binaria(nombre)
+SI resultado ≠ NULO ENTONCES
+    imprimir f"---Encontrado: {resultado['nombre']} - Nota: {resultado['nota']}"
+SINO
+    imprimir "---No se encontró el curso---"
+FIN SI
+
+
+FIN FUNCION
+
+FUNCION simular_cola_revision()
+imprimir "Ingrese curso para revisión (escriba 'fin' para terminar):"
+MIENTRAS VERDADERO HACER
+curso ← leer().strip().lower()
+SI curso = "fin" ENTONCES
+salir del bucle
+FIN SI
+SI curso = "" ENTONCES
+imprimir "El nombre del curso no puede estar vacío."
+continuar
+FIN SI
+agregar curso al final de cola
+FIN MIENTRAS
+
+imprimir "Procesando solicitudes:"
+MIENTRAS cola NO está vacía HACER
+    curso_actual ← eliminar primer elemento de cola
+    imprimir f"Revisando: {curso_actual}"
+FIN MIENTRAS
+
+
+FIN FUNCION
+
+FUNCION mostrar_historial()
+SI historial está vacío ENTONCES
+imprimir "---El historial está vacío---"
+SINO
+imprimir "---- HISTORIAL DE CAMBIOS ----"
+PARA CADA h EN historial EN ORDEN INVERSO HACER
+imprimir h
+FIN PARA
+FIN SI
+FIN FUNCION
+
+PROGRAMA PRINCIPAL:
+MIENTRAS VERDADERO HACER
+imprimir "=== MENÚ PRINCIPAL ==="
+imprimir "1. Registrar curso"
+imprimir "2. Ver cursos"
+imprimir "3. Calcular promedio general"
+imprimir "4. Contar cursos aprobados y reprobados"
+imprimir "5. Buscar curso (búsqueda lineal)"
+imprimir "6. Actualizar nota"
+imprimir "7. Eliminar curso"
+imprimir "8. Ordenar por nota (burbuja)"
+imprimir "9. Ordenar por nombre (inserción)"
+imprimir "10. Buscar curso (búsqueda binaria)"
+imprimir "11. Simular cola de solicitudes"
+imprimir "12. Mostrar historial (pila)"
+imprimir "13. Salir"
+
+    opcion ← leer().strip()
+
+    SI opcion = "1" ENTONCES
+        llamar registrar_curso()
+    SINO SI opcion = "2" ENTONCES
+        llamar mostrar_curso()
+    SINO SI opcion = "3" ENTONCES
+        llamar promedio_general()
+    SINO SI opcion = "4" ENTONCES
+        llamar cursos_aprobados_reprobados()
+    SINO SI opcion = "5" ENTONCES
+        llamar buscar_curso()
+    SINO SI opcion = "6" ENTONCES
+        llamar actualizar_nota()
+    SINO SI opcion = "7" ENTONCES
+        llamar eliminar_curso()
+    SINO SI opcion = "8" ENTONCES
+        llamar ordenar_burbuja()
+    SINO SI opcion = "9" ENTONCES
+        llamar ordenar_por_insercion()
+    SINO SI opcion = "10" ENTONCES
+        llamar buscar_curso_binario()
+    SINO SI opcion = "11" ENTONCES
+        llamar simular_cola_revision()
+    SINO SI opcion = "12" ENTONCES
+        llamar mostrar_historial()
+    SINO SI opcion = "13" ENTONCES
+        imprimir "Saliendo del programa... ¡Gracias por usar mi proyecto!"
+        romper // terminar bucle principal
+    SINO
+        imprimir "Opción no válida. Intente de nuevo."
+    FIN SI
+    FIN MIENTRAS
+FIN PROGRAMA

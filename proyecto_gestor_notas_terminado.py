@@ -5,17 +5,22 @@ cursos = []
 historial = []
 
 # Cola de solicitudes de revisión (primero en entrar, primero en salir)
-solicitudes = []
+cola = []
 
 
 # ================== FUNCIÓN: REGISTRAR CURSO ==================
 def registrar_curso():
-    nombre = input("\nIngrese el nombre del curso: ")
+    nombre = input("\nIngrese el nombre del curso: ").strip().lower()
 
     # Validación: el nombre no puede estar vacío
     if nombre == "":
         print("\n-El nombre no puede estar vacío, escribir de nuevo-\n")
         return
+
+
+    for curso in cursos:
+        if curso['nombre'].lower()==nombre.lower():
+            print(f"\n--- El curso: {nombre} ya esta registrado, no se puede repetir---\n")
 
     try:
         nota = float(input("Ingrese la nota del curso (0-100): "))
@@ -73,8 +78,8 @@ def cursos_aprobados_reprobados():
     aprobados = sum(1 for c in cursos if c["nota"] >= 60)
     reprobados = len(cursos) - aprobados
 
-    print(f"\n---Aprobados: {aprobados} --- Reprobados: {reprobados}---\n")
-
+    print(f"\n---Aprobados: {aprobados}")
+    print(f"---Reprobados: {reprobados}\n")
 
 # ================== FUNCIÓN: BÚSQUEDA LINEAL ==================
 def buscar_curso():
@@ -213,37 +218,29 @@ def buscar_curso_binario():
 
 
 # ================== SIMULACIÓN DE COLA DE SOLICITUDES ==================
-def simular_solicitudes():
+def simular_cola_revision():
+    print("Ingrese curso para revisión (escriba 'fin' para terminar):")
+
+
+
     while True:
-        print("\n== Simulación de solicitudes ==")
-        print("1. Agregar solicitud")
-        print("2. Atender solicitud")
-        print("3. Mostrar cola de solicitudes")
-        print("4. Salir")
+        curso = input("> ").strip().lower()  # elimina espacios al inicio y final
 
-        opcion = input("---Seleccione una opción: ")
-
-        if opcion == "1":
-            s = input("---Ingrese la solicitud: ")
-            solicitudes.append(s)
-            print("---Solicitud agregada---")
-        elif opcion == "2":
-            if solicitudes:
-                # Cambiar pop() por pop(0) para simular correctamente una cola FIFO
-                print(f"\n---Atendiendo: {solicitudes.pop(0)}")
-            else:
-                print("\n---No hay solicitudes---\n")
-        elif opcion == "3":
-            if solicitudes:
-                print("\n---COLA DE SOLICITUDES---")
-                for s in solicitudes:
-                    print(s)
-            else:
-                print("\n---COLA VACÍA---")
-        elif opcion == "4":
+        if curso.lower() == "fin":
             break
-        else:
-            print("\n---Opción inválida---\n")
+
+        if curso == "":
+            print("El nombre del curso no puede estar vacío.")
+            continue
+
+        cola.append(curso)  # agrega al final de la lista (cola)
+
+    print("\nProcesando solicitudes:")
+
+    # Recorremos la cola en orden de ingreso
+    while cola:
+        curso_actual = cola.pop(0)  # extrae el primer elemento
+        print(f"Revisando: {curso_actual}")
 
 
 # ================== FUNCIÓN: MOSTRAR HISTORIAL (PILA) ==================
@@ -304,7 +301,7 @@ while True:
     elif opcion == "10":
         buscar_curso_binario()
     elif opcion == "11":
-        simular_solicitudes()
+        simular_cola_revision()
     elif opcion == "12":
         mostrar_historial()
     elif opcion == "13":
